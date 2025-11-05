@@ -89,6 +89,16 @@ app.get('/hasard', (req, res) => {
         // Choix d'un id au hasard
         const randomIndex = Math.floor(Math.random() * (maxId - minId + 1)) + minId;
         const randomPokemon = pokedex[randomIndex];
+
+        if (randomPokemon.id < 100 && randomPokemon.id >= 10) {
+            randomPokemon.image = `${IMAGES_SRC}/0${randomPokemon.id}.png`;
+        }
+        else if (randomPokemon.id < 10) {
+            randomPokemon.image = `${IMAGES_SRC}/00${randomPokemon.id}.png`;
+        }
+        else {
+            randomPokemon.image = `${IMAGES_SRC}/${randomPokemon.id}.png`;
+        }
         //Affichage du pokemon corrspondant à l'id précédent.
         res.json(randomPokemon);
     });
@@ -118,6 +128,7 @@ app.get('/combat', (req, res) => {
             rdmIndex2 = Math.floor(Math.random() * (maxId - minId + 1)) + minId;
         }
         let rdmPokemon2 = pokedex[rdmIndex2];
+
 
         //Affichage des deux pokémons pour le combat
         res.json({ pokemon1: rdmPokemon1, pokemon2: rdmPokemon2 });

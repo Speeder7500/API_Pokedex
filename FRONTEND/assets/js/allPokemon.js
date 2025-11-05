@@ -26,6 +26,7 @@ function allPokemon(dataPokemon){
     // définition des variables
     let id = dataPokemon.id;
     let nom = dataPokemon.name.french;
+    let image = dataPokemon.image;
 
     if (id < 100 && id >= 10) {
         id = `0${dataPokemon.id}`;
@@ -42,7 +43,7 @@ function allPokemon(dataPokemon){
     let colImg = document.createElement('td');
 
     let img = document.createElement('img');
-    img.src = dataPokemon.image;
+    img.src = image;
     img.width = 50;
     img.height = 50;
     
