@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
  * Création de la route pour voir tout les pokemons
  * @ returns {void}
  */
-app.get('/tous', (req, res) => {
+app.get('/tousLesPokemon', (req, res) => {
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
         if (err) {
             console.error('Erreur lors de la lecture du fichier :', err);

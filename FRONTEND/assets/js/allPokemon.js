@@ -1,5 +1,5 @@
 // définition du endpoint
-let endpoint = '/tous';
+let endpoint = '/tousLesPokemon';
 
 fetch(endpoint)
     .then(
