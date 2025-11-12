@@ -6,54 +6,49 @@ fetch(endpoint)
             if (response.status == 200) {
                 response.json()
                     .then(
-                        function (data) {
-                            let contenu = document.getElementById('pokemonHasard');
-                            contenu.appendChild(randomPokemon(data));
+                        function (dataPokemon) {
+                            let divPokemon = document.getElementById('pokemonHasard');
+                            divPokemon.appendChild(rdmPokemon(dataPokemon));
                         }
-                    );
+                    )
             } else {
                 console.log('Status de la réponse: ' + response.status);
             }
         }
     );
 
-function randomPokemon(dataPokemon) {
-    let pokemonHasard = document.getElementById('pokemonHasard');
-    let id = dataPokemon.id;
-    let nom = dataPokemon.name.french;
-    let image = dataPokemon.image;
-    let type = dataPokemon.type;
-    let vie = dataPokemon.base.HP;
-    let attaque = dataPokemon.base.Attack;
-    let defense = dataPokemon.base.Defense;
-    let attaqueSpe = dataPokemon.base['Sp. Attack'];
-    let defenseSpe = dataPokemon.base['Sp. Defense'];
-    let vitesse = dataPokemon.base.Speed;
+function rdmPokemon(data){
+    // définition des variables
+    let id = data.id;
+    let nom = data.name.french;
+    let image = data.image;
+    let type = data.type;
+    let hp = data.base.HP;
+    let attack = data.base.Attack;
+    let defense = data.base.Defense;
+    let speed = data.base.Speed;
 
-    let titre = document.createElement('h2');
-    titre.innerText = "Voici votre pokemon choisit au hasard !";
-
-    let img = document.createElement('img');
-    img.src = image;
-    img.width = 200;
-    img.height = 200;
-    contenu.appendChild(img);
+    if (id < 100 && id >= 10) {
+        id = `0${data.id}`;
+    }
+    else if (id < 10) {
+        id = `00${data.id}`;
+    }
 
     let para = document.createElement('p');
     para.innerHTML = `<strong>ID :</strong> ${id} <br>
                       <strong>Nom :</strong> ${nom} <br>
                       <strong>Type :</strong> ${type.join(', ')} <br>
-                      <strong>Vie :</strong> ${vie} <br>
-                      <strong>Attaque :</strong> ${attaque} <br>
-                      <strong>Défense :</strong> ${defense} <br>
-                      <strong>Attaque Spéciale :</strong> ${attaqueSpe} <br>
-                      <strong>Défense Spéciale :</strong> ${defenseSpe} <br>
-                      <strong>Vitesse :</strong> ${vitesse} <br>`;
-
-    pokemonHasard.appendChild(titre);
-    pokemonHasard.appendChild(para);
+                      <strong>HP :</strong> ${hp} <br>
+                      <strong>Attack :</strong> ${attack} <br>
+                      <strong>Defense :</strong> ${defense} <br>
+                      <strong>Speed :</strong> ${speed} <br>`;
+                          
+    let img = document.createElement('img');
+    img.src = image;
+    img.width = 200;
+    img.height = 200;
+    para.appendChild(img);
     
-
-
-    return pokemonHasard;
+    return para;
 }
