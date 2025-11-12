@@ -53,8 +53,11 @@ app.get('/tous', (req, res) => {
         // Convertion du json en objet js
         const pokedex = JSON.parse(data);
 
+        // Ajout des images aux pokémons
         pokedex.forEach(pokemon => {
             let ImgPokemon;
+            // création du chemin de l'image
+            // ajouter un préfixe 0 ou 00 si besoin
             if (pokemon.id < 100 && pokemon.id >= 10) {
                 ImgPokemon = `${IMAGES_SRC}/0${pokemon.id}.png`;
             }
@@ -77,6 +80,7 @@ app.get('/tous', (req, res) => {
  * @ returns {void}
  */
 app.get('/hasard', (req, res) => {
+    // Lire le fichier JSON contenant le pokedex
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
         if (err) {
             console.error('Erreur lors de la lecture du fichier :', err);
@@ -84,6 +88,7 @@ app.get('/hasard', (req, res) => {
             return;
         }
 
+        // Convertion du json en objet js
         const pokedex = JSON.parse(data);
         const minId = 0;
         const maxId = pokedex.length - 1;
@@ -92,6 +97,8 @@ app.get('/hasard', (req, res) => {
         const randomIndex = Math.floor(Math.random() * (maxId - minId + 1)) + minId;
         const randomPokemon = pokedex[randomIndex];
 
+        // création du chemin de l'image
+        // ajouter un préfixe 0 ou 00 si besoin
         if (randomPokemon.id < 100 && randomPokemon.id >= 10) {
             randomPokemon.image = `${IMAGES_SRC}/0${randomPokemon.id}.png`;
         }
@@ -111,6 +118,7 @@ app.get('/hasard', (req, res) => {
  * @ returns {void}
  */
 app.get('/combat', (req, res) => {
+    // Lire le fichier JSON contenant le pokedex
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
         if (err) {
             console.error('Erreur lors de la lecture du fichier :', err);
@@ -118,6 +126,7 @@ app.get('/combat', (req, res) => {
             return;
         }
 
+        // Convertion du json en objet js
         const pokedex = JSON.parse(data);
         const minId = 0;
         const maxId = pokedex.length - 1;
@@ -144,6 +153,7 @@ app.get('/combat', (req, res) => {
  * @ returns {void}
  */
 app.get('/pokemon/:data', (req, res) => {
+    // Récupération de la donnée (id ou nom)
     const Data = (req.params.data);
     console.log(Data);
     if (/^\d+$/.test(Data)) { // vérification si c'est un nombre entier positif
@@ -153,10 +163,13 @@ app.get('/pokemon/:data', (req, res) => {
                 res.status(500).send('Erreur serveur');
                 return;
             }
+            // Parser le fichier JSON en tableau JavaScript
             const pokedex = JSON.parse(data);
             const pokemon = pokedex[Data - 1];
 
             if (pokemon) {
+                // création du chemin de l'image
+                // ajouter un préfixe 0 ou 00 si besoin
                 let ImgPokemon;
                 console.log(pokemon);
                 if (pokemon.id < 100 && pokemon.id >= 10) {
@@ -171,6 +184,7 @@ app.get('/pokemon/:data', (req, res) => {
                     ImgPokemon = `${IMAGES_SRC}/${pokemon.id}.png`;
                     console.log(ImgPokemon);
                 }
+                // Ajouter le chemin de l'image au Pokémon
                 pokemon.image = ImgPokemon;
                 res.json(pokemon);
             } else {
@@ -224,6 +238,7 @@ app.get('/pokemon/:data', (req, res) => {
                     ImgPokemon = `${IMAGES_SRC}/${pokemon.id}.png`;
                     console.log(ImgPokemon);
                 }
+                // Ajouter le chemin de l'image au Pokémon
                 pokemon.image = ImgPokemon;
                 res.json(pokemon);
             } else {
@@ -262,8 +277,9 @@ app.get('/type/:type', (req, res) => {
         'glace': 'Ice',
         'dragon': 'Dragon',
         'tenebres': 'Dark',
-        'fee': 'Fairy'
+        'fee': 'Fairy',
     };
+    // Lire le fichier JSON contenant le pokedex
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
         if (err) {
             console.error('Erreur lors de la lecture du fichier :', err);
@@ -271,7 +287,9 @@ app.get('/type/:type', (req, res) => {
             return;
         }
         const type = req.params.type;
+        // Vérification si c'est une chaîne de caractère (lettres Unicode uniquement)
         if (/^\p{L}+$/u.test(type)) {
+            // Mettre la première lettre en majuscule et le reste en minuscules
             const typeSearch = Array.from(type);
             const typeFormatted = typeSearch.length
                 ? typeSearch[0].toUpperCase() + typeSearch.slice(1).join('').toLowerCase()
@@ -286,15 +304,19 @@ app.get('/type/:type', (req, res) => {
                 return;
             }
 
+            // Filtrer les pokémons par type incluant la recherche
             const pokedex = JSON.parse(data);
             const pokemonsType = pokedex.filter(pokemon => pokemon.type.includes(typeEnglish));
             if (pokemonsType.length === 0) {
-                res.status(400).send('Aucun pokémon trouvé pour ce type');
+                res.status(400).send('Aucun pokémon trouvé pour ce type les types existants sont : ' + Object.keys(typeTranslations).join(', '));
                 return;
             }
 
+            // Ajout des images aux pokémons trouvés
             pokemonsType.forEach(pokemon => {
                 let ImgPokemon;
+                // création du chemin de l'image
+                // ajouter un préfixe 0 ou 00 si besoin
                 if (pokemon.id < 100 && pokemon.id >= 10) {
                     ImgPokemon = `${IMAGES_SRC}/0${pokemon.id}.png`;
                 }
@@ -304,6 +326,7 @@ app.get('/type/:type', (req, res) => {
                 else {
                     ImgPokemon = `${IMAGES_SRC}/${pokemon.id}.png`;
                 }
+                // Ajouter le chemin de l'image au Pokémon
                 pokemon.image = ImgPokemon;
             });
 
