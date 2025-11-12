@@ -35,12 +35,13 @@ app.listen(
  * Route par défaut qui renvoie vers une page html
 */
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname , '../FRONTEND/index.html'));
+    res.sendFile(path.join(__dirname, '../FRONTEND/index.html'));
 });
-    
+
 
 /**
  * Création de la route pour voir tout les pokemons
+ * @ returns {void}
  */
 app.get('/tous', (req, res) => {
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
@@ -73,6 +74,7 @@ app.get('/tous', (req, res) => {
 
 /**
  * Création de la route du hasard
+ * @ returns {void}
  */
 app.get('/hasard', (req, res) => {
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
@@ -106,6 +108,7 @@ app.get('/hasard', (req, res) => {
 
 /**
  * Création de la route du combat
+ * @ returns {void}
  */
 app.get('/combat', (req, res) => {
     fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
@@ -118,7 +121,7 @@ app.get('/combat', (req, res) => {
         const pokedex = JSON.parse(data);
         const minId = 0;
         const maxId = pokedex.length - 1;
-        
+
         // Choix de deux id au hasard
         let rdmIndex1 = Math.floor(Math.random() * (maxId - minId + 1)) + minId;
         let rdmPokemon1 = pokedex[rdmIndex1];
@@ -138,6 +141,7 @@ app.get('/combat', (req, res) => {
 
 /**
  * Création de la route permettant de trouver un pokemon par son id
+ * @ returns {void}
  */
 app.get('/pokemon/:data', (req, res) => {
     const Data = (req.params.data);
@@ -150,7 +154,7 @@ app.get('/pokemon/:data', (req, res) => {
                 return;
             }
             const pokedex = JSON.parse(data);
-            const pokemon = pokedex[Data -1];
+            const pokemon = pokedex[Data - 1];
 
             if (pokemon) {
                 let ImgPokemon;
@@ -204,8 +208,10 @@ app.get('/pokemon/:data', (req, res) => {
 
             // Si trouvé, renvoyer le Pokémon, sinon 400
             if (pokemon) {
+                // création du chemin de l'image
                 let ImgPokemon;
                 console.log(pokemon);
+                // ajouter un préfixe 0 ou 00 si besoin
                 if (pokemon.id < 100 && pokemon.id >= 10) {
                     ImgPokemon = `${IMAGES_SRC}/0${pokemon.id}.png`;
                     console.log(ImgPokemon);
@@ -227,6 +233,86 @@ app.get('/pokemon/:data', (req, res) => {
     } else {
         res.end('Veuillez entrer uniquement des lettres ou des nombres superieur a 1.');
     }
+});
+
+
+/**
+ * Création de la route permettant de trouver des pokémons par leur type
+ * @ returns {void}
+ */
+app.get('/type/:type', (req, res) => {
+    /**
+     * Dictionnaire de traduction français -> anglais pour les types
+     */
+    const typeTranslations = {
+        'normal': 'Normal',
+        'combat': 'Fighting',
+        'vol': 'Flying',
+        'poison': 'Poison',
+        'sol': 'Ground',
+        'roche': 'Rock',
+        'insecte': 'Bug',
+        'spectre': 'Ghost',
+        'acier': 'Steel',
+        'feu': 'Fire',
+        'eau': 'Water',
+        'plante': 'Grass',
+        'electrique': 'Electric',
+        'psy': 'Psychic',
+        'glace': 'Ice',
+        'dragon': 'Dragon',
+        'tenebres': 'Dark',
+        'fee': 'Fairy'
+    };
+    fs.readFile(POKEDEX_SRC, 'utf-8', (err, data) => {
+        if (err) {
+            console.error('Erreur lors de la lecture du fichier :', err);
+            res.status(500).send('Erreur serveur');
+            return;
+        }
+        const type = req.params.type;
+        if (/^\p{L}+$/u.test(type)) {
+            const typeSearch = Array.from(type);
+            const typeFormatted = typeSearch.length
+                ? typeSearch[0].toUpperCase() + typeSearch.slice(1).join('').toLowerCase()
+                : '';
+
+            // Vérifier si c'est un type français et le convertir en anglais
+            let typeEnglish = typeTranslations[typeFormatted.toLowerCase()] || typeFormatted;
+            console.log(`Type recherché (français): ${typeFormatted}, Type anglais: ${typeEnglish}`);
+
+            if (typeEnglish === undefined) {
+                res.status(400).send('Type de pokémon inexistant');
+                return;
+            }
+
+            const pokedex = JSON.parse(data);
+            const pokemonsType = pokedex.filter(pokemon => pokemon.type.includes(typeEnglish));
+            if (pokemonsType.length === 0) {
+                res.status(400).send('Aucun pokémon trouvé pour ce type');
+                return;
+            }
+
+            pokemonsType.forEach(pokemon => {
+                let ImgPokemon;
+                if (pokemon.id < 100 && pokemon.id >= 10) {
+                    ImgPokemon = `${IMAGES_SRC}/0${pokemon.id}.png`;
+                }
+                else if (pokemon.id < 10) {
+                    ImgPokemon = `${IMAGES_SRC}/00${pokemon.id}.png`;
+                }
+                else {
+                    ImgPokemon = `${IMAGES_SRC}/${pokemon.id}.png`;
+                }
+                pokemon.image = ImgPokemon;
+            });
+
+            res.json(pokemonsType);
+        }
+        else {
+            res.status(400).send('Veuillez entrer uniquement des lettres pour le type de pokémon.');
+        }
+    })
 });
 
 app.use(express.static(path.join(__dirname, '../FRONTEND')));
