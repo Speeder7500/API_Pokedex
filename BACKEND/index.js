@@ -4,6 +4,7 @@
 
 // Définition de l'emplacement des fichier bases de données
 const POKEDEX_SRC = "./DATA/pokedex.json";
+const ITEMS_SRC = "./DATA/items.json";
 
 // Définition de l'emplacement des images (chemin côté client)
 const IMAGES_SRC = "/FILES/images";
@@ -336,6 +337,139 @@ app.get('/type/:type', (req, res) => {
             res.status(400).send('Veuillez entrer uniquement des lettres pour le type de pokémon.');
         }
     })
+});
+
+app.get('/tousLesItems', (req, res) => {
+    // Lire le fichier JSON contenant
+    fs.readFile(ITEMS_SRC, 'utf-8', (err, data) => {
+        if (err) {
+            console.error('Erreur lors de la lecture du fichier :', err);
+            res.status(500).send('Erreur serveur');
+            return;
+        }
+        // Convertion du json en objet js
+        const items = JSON.parse(data);
+
+        // Renvoyer le contenu de la source
+        res.json(items);
+    });
+})
+
+/**
+ * Dictionnaire de traduction français -> anglais pour les items
+ */
+const itemsTranslations = {
+    'potion': 'Potion',
+    'antidote': 'Antidote',
+    'soin brûlure': 'Burn Heal',
+    'soin gel': 'Ice Heal',
+    'réveil': 'Awakening',
+    'soin paralysie': 'Paralyze Heal',
+    'restauration': 'Full Restore',
+    'potion max': 'Max Potion',
+    'potion super': 'Hyper Potion',
+    'super potion': 'Super Potion',
+    'soins complets': 'Full Heal',
+    'rappel': 'Revive',
+    'rappel max': 'Max Revive',
+    'eau fraîche': 'Fresh Water',
+    'limonade': 'Soda Pop',
+    'lait': 'Lemonade',
+    'lait meumeu': 'Moomoo Milk',
+    'poudre énergie': 'Energy Powder',
+    'racine énergie': 'Energy Root',
+    'poudre soin': 'Heal Powder',
+    'herbe réveil': 'Revival Herb',
+    'éther': 'Ether',
+    'éther max': 'Max Ether',
+    'élixir': 'Elixir',
+    'élixir max': 'Max Elixir',
+    'miel miel': 'Lava Cookie',
+    'jus baie': 'Berry Juice',
+    'cendre sacrée': 'Sacred Ash',
+    'augmentation hp': 'HP Up',
+    'protéine': 'Protein',
+    'fer': 'Iron',
+    'carbos': 'Carbos',
+    'calcium': 'Calcium',
+    'bonbon rare': 'Rare Candy',
+    'montée pp': 'PP Up',
+    'zinc': 'Zinc',
+    'pp max': 'PP Max',
+    'gâteau ancien': 'Old Gateau',
+    'écran spéc': 'Guard Spec.',
+    'coup critique': 'Dire Hit',
+    'attaque+': 'X Attack',
+    'défense+': 'X Defense',
+    'vitesse+': 'X Speed',
+    'précision+': 'X Accuracy',
+    'spa+': 'X Sp. Atk',
+    'spd+': 'X Sp. Def'
+};
+
+app.get('/item/:data', (req, res) => {
+    // Récupération de la donnée (id ou nom)
+    const Data = (req.params.data);
+    console.log(Data);
+    if (/^\d+$/.test(Data)) { // vérification si c'est un nombre entier positif
+        fs.readFile(ITEMS_SRC, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Erreur lors de la lecture du fichier :', err);
+                res.status(500).send('Erreur serveur');
+                return;
+            }
+            // Parser le fichier JSON en tableau JavaScript
+            const items = JSON.parse(data);
+            const item = items.find(i => i.id === parseInt(Data));
+
+            if (item) {
+                res.json(item);
+            } else {
+                res.status(400).send('Item non trouvé')
+            }
+        });
+    } else if (/^\p{L}+(\s\p{L}+)*$/u.test(Data)) {// Vérification si c'est une chaîne de caractère (lettres Unicode et espaces)
+        // Lire le fichier JSON contenant les items
+        fs.readFile(ITEMS_SRC, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Erreur lors de la lecture du fichier :', err);
+                res.status(500).send('Erreur serveur');
+                return;
+            }
+            // Normaliser la saisie pour gérer correctement les caractères Unicode
+            // Traiter chaque mot séparément pour maintenir les espaces
+            const words = Data.trim().split(/\s+/);
+            const nom = words.map(word => {
+                const chars = Array.from(word);
+                return chars.length
+                    ? chars[0].toUpperCase() + chars.slice(1).join('').toLowerCase()
+                    : '';
+            }).join(' ');
+
+            // Vérifier si c'est un item français et le convertir en anglais
+            let itemEnglish = itemsTranslations[nom.toLowerCase()] || nom;
+            console.log(`Item recherché (français): ${nom}, Item anglais: ${itemEnglish}`);
+
+            // Parser le fichier JSON en tableau JavaScript
+            const items = JSON.parse(data);
+
+            // Rechercher l'Item dans le tableau en comparant les noms anglais
+            const item = items.find(i => {
+                if (!i || !i.name) return false;
+                const itemName = i.name.english || '';
+                return itemName === itemEnglish;
+            });
+
+            // Si trouvé, renvoyer l'Item, sinon 400
+            if (item) {
+                res.json(item);
+            } else {
+                res.status(400).send('Item non trouvé')
+            }
+        });
+    } else {
+        res.end('Veuillez entrer uniquement des lettres ou des nombres superieur a 1.');
+    }
 });
 
 app.use(express.static(path.join(__dirname, '../FRONTEND')));
