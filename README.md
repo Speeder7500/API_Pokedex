@@ -5,7 +5,6 @@ Cloner le dépôt à l'endroit ou vous voulez.
 Assurer vous d'avoir node d'installer
 
 ## Lancement
-Aller dans le dossier BACKEND et vous trouverez le fichier index.js remplacer l'adresse ip par la votre.
 Ouvrer un invite de commande à l'endroit du fichier index.js et taper la commande suivante 'node index.js'.
 L'API est démarée, vous pouvez l'utiliser en allant sur un navigateur internet et tapez '<votre adresse ip>:5001' pour attérir sur la page d'acceuil.
 
