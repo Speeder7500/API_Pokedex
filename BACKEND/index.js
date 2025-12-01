@@ -26,7 +26,7 @@ app.use('/FILES/images', express.static(path.join(__dirname, 'FILES', 'images'))
 // Lancement du serveur et attendre
 app.listen(
     PORT,
-    '172.16.195.254',
+    '127.0.0.1',
     () => {
         console.log(`Server Pokedex is listening on ${PORT}`);
     }
