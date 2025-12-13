@@ -142,8 +142,31 @@ app.get('/combat', (req, res) => {
         }
         let rdmPokemon2 = pokedex[rdmIndex2];
 
+        // création du chemin de l'image pour le premier pokemon
+        if (rdmPokemon1.id < 100 && rdmPokemon1.id >= 10) {
+            rdmPokemon1.image = `${IMAGES_SRC}/0${rdmPokemon1.id}.png`;
+        }
+        else if (rdmPokemon1.id < 10) {
+            rdmPokemon1.image = `${IMAGES_SRC}/00${rdmPokemon1.id}.png`;
+        }
+        else {
+            rdmPokemon1.image = `${IMAGES_SRC}/${rdmPokemon1.id}.png`;
+        }
+
+        // création du chemin de l'image pour le deuxième pokemon
+        if (rdmPokemon2.id < 100 && rdmPokemon2.id >= 10) {
+            rdmPokemon2.image = `${IMAGES_SRC}/0${rdmPokemon2.id}.png`;
+        }
+        else if (rdmPokemon2.id < 10) {
+            rdmPokemon2.image = `${IMAGES_SRC}/00${rdmPokemon2.id}.png`;
+        }
+        else {
+            rdmPokemon2.image = `${IMAGES_SRC}/${rdmPokemon2.id}.png`;
+        }
+
 
         //Affichage des deux pokémons pour le combat
+        
         res.json({ pokemon1: rdmPokemon1, pokemon2: rdmPokemon2 });
     });
 });
